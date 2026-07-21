@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { Link } from 'react-router'
 import { createApplication, fetchApplications, withdrawApplication } from './api'
 import { applicationFormSchema, type ApplicationFormValues } from './schema'
 
@@ -104,7 +105,12 @@ export default function ApplicationsPage() {
         <ul aria-label="Applications" className="divide-y divide-slate-200 rounded-md border border-slate-200">
           {applications.data.map((application) => (
             <li key={application.id} className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-slate-900">{application.name}</span>
+              <Link
+                to={`/applications/${application.id}`}
+                className="text-sm text-slate-900 hover:underline"
+              >
+                {application.name}
+              </Link>
               <button
                 type="button"
                 onClick={() => withdraw.mutate(application.id)}

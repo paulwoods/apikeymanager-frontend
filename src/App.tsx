@@ -1,4 +1,5 @@
 import { NavLink, Route, Routes } from 'react-router'
+import ApplicationDetailPage from './applications/ApplicationDetailPage'
 import ApplicationsPage from './applications/ApplicationsPage'
 
 function Placeholder({ title }: { title: string }) {
@@ -28,6 +29,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Placeholder title="API Key Manager" />} />
           <Route path="/applications" element={<ApplicationsPage />} />
+          <Route path="/applications/:applicationId" element={<ApplicationDetailPage />} />
         </Routes>
       </main>
     </div>

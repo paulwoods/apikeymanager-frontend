@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { expect, test, vi } from 'vitest'
-import { renderWithQueryClient } from '../test/render'
+import { renderWithProviders } from '../test/render'
 import { server } from '../test/server'
 import ApplicationsPage from './ApplicationsPage'
 
@@ -26,7 +26,7 @@ function listReturns(...names: string[]) {
 test('lists the applications returned by the API', async () => {
   listReturns('Billing', 'Reporting')
 
-  renderWithQueryClient(<ApplicationsPage />)
+  renderWithProviders(<ApplicationsPage />)
 
   const list = await screen.findByRole('list', { name: /applications/i })
   expect(within(list).getAllByRole('listitem')).toHaveLength(2)
@@ -34,10 +34,24 @@ test('lists the applications returned by the API', async () => {
   expect(within(list).getByText('Reporting')).toBeInTheDocument()
 })
 
+/** The list is the only way in to an application's key owners. */
+test('links each application to its detail page', async () => {
+  const billing = application('Billing')
+  server.use(http.get('/api/applications', () => HttpResponse.json({ content: [billing] })))
+
+  renderWithProviders(<ApplicationsPage />)
+
+  const list = await screen.findByRole('list', { name: /applications/i })
+  expect(within(list).getByRole('link', { name: 'Billing' })).toHaveAttribute(
+    'href',
+    `/applications/${billing.id}`,
+  )
+})
+
 test('shows an empty state when there are no applications', async () => {
   listReturns()
 
-  renderWithQueryClient(<ApplicationsPage />)
+  renderWithProviders(<ApplicationsPage />)
 
   expect(await screen.findByText(/no applications yet/i)).toBeInTheDocument()
 })
@@ -55,7 +69,7 @@ test('creates an application and shows it in the refreshed list', async () => {
     }),
   )
 
-  renderWithQueryClient(<ApplicationsPage />)
+  renderWithProviders(<ApplicationsPage />)
   await screen.findByText(/no applications yet/i)
 
   await userEvent.type(screen.getByRole('textbox', { name: /name/i }), 'Billing')
@@ -76,7 +90,7 @@ test('rejects a blank name without calling the API', async () => {
     }),
   )
 
-  renderWithQueryClient(<ApplicationsPage />)
+  renderWithProviders(<ApplicationsPage />)
   await screen.findByText(/no applications yet/i)
 
   await userEvent.type(screen.getByRole('textbox', { name: /name/i }), '   ')
@@ -106,7 +120,7 @@ test('surfaces a duplicate-name conflict from the API', async () => {
     ),
   )
 
-  renderWithQueryClient(<ApplicationsPage />)
+  renderWithProviders(<ApplicationsPage />)
   await screen.findByRole('list', { name: /applications/i })
 
   await userEvent.type(screen.getByRole('textbox', { name: /name/i }), 'Billing')
@@ -128,7 +142,7 @@ test('withdraws an application and refreshes the list', async () => {
     }),
   )
 
-  renderWithQueryClient(<ApplicationsPage />)
+  renderWithProviders(<ApplicationsPage />)
   const list = await screen.findByRole('list', { name: /applications/i })
 
   await userEvent.click(within(list).getByRole('button', { name: /withdraw billing/i }))
