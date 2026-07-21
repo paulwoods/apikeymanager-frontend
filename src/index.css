@@ -1,0 +1,4 @@
+/* Tailwind v4: this single import replaces v3's @tailwind directives. There is no
+   tailwind.config.js, no PostCSS config and no content array — the @tailwindcss/vite
+   plugin discovers sources itself. */
+@import 'tailwindcss';
