@@ -1,4 +1,5 @@
 import { NavLink, Route, Routes } from 'react-router'
+import ApplicationsPage from './applications/ApplicationsPage'
 
 function Placeholder({ title }: { title: string }) {
   return <h2 className="text-lg font-medium text-slate-700">{title}</h2>
@@ -26,7 +27,7 @@ export default function App() {
       <main className="mx-auto max-w-5xl px-6 py-8">
         <Routes>
           <Route path="/" element={<Placeholder title="API Key Manager" />} />
-          <Route path="/applications" element={<Placeholder title="Applications" />} />
+          <Route path="/applications" element={<ApplicationsPage />} />
         </Routes>
       </main>
     </div>
